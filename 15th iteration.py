@@ -495,19 +495,28 @@ class TexasHoldem:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_f:
                         self.flop()
+                        # triggers the flop
                     elif event.key == pygame.K_t:
                         self.turn()
+                        # triggers the turn
                     elif event.key == pygame.K_r:
                         self.river()
+                        # triggers the river
                     elif event.key == pygame.K_y:
                         self.reset_community_cards()
                         self.reset_player_hands()
+                        # triggers the reset
                     elif event.key == pygame.K_e:
+                        # triggers the exit oppourtunity
                         exit = str(input("Are you sure? "))
                         if exit == 'y':
                           running = False
                         else: 
                           running = True
+                          # asks the user for an input as to
+                          # whether they would like to remain
+                          # in the game
+                        
 
             self.screen.fill((0, 128, 0))  
             # green background for the table
