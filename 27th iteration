@@ -592,9 +592,26 @@ class TexasHoldem:
             else:
               self.deal_community_card(5 - community_cards_total)
               # deals the remaining community cards
-              print(compare_hands(self.players, self.community_cards,
-              bot_funds, user_funds, pot_total))
+              name, win_type, high_card = compare_hands(self.players,
+              self.community_cards)
               # outputs the winner
+              
+              if name == 'Bot':
+                bot_funds += pot_total
+                # if the bot has won, the pot will be sent
+                # to its funds
+              else:
+                user_funds += pot_total
+                # if the user has won, the pot will be sent
+                # to their funds
+              
+              print(name, "won with", win_type, "of high card",
+              high_card)
+              # outputs the winner
+              pot_total = 0
+              user_bet = 0
+              bot_bet = 0
+              # resets all of the displayed values
               
               self.display_fixed_drawings()
               self.display_fixed_text(user_funds, user_bet, bot_funds,
@@ -604,8 +621,8 @@ class TexasHoldem:
               pygame.display.flip()
               clock.tick(60)
               # loads the display
-              time.sleep(10)
-            
+              
+              time.sleep(5)
               self.reset_all()
               # resets the community cards and hands
               user_bet = blinds
@@ -693,4 +710,3 @@ def main():
 if __name__ == '__main__':
     main()
     # calls the game loop
-
