@@ -5,10 +5,13 @@ import random, pygame
 class Card:
   suits = {'Yellow': 'Y', 'Red': 'R', 'Blue': 'B', 'Green': 'G'}
   # a dictionary containing ties between the suits and the letter to represent them
-  values = ['2', '3', '4', '5', '6', '7', '8', '9', 'skip', 'reverse', '+2',]
+  values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'O', 'R', '+2',]
   # an array which contains the possible card values
   wild_suit = {'Wild' : 'W'}
-  wild_value = ['+4', 'wild']
+  # a dictionary for the suits of the wild cards
+  wild_value = ['+4', 'W']
+  # an array containing the two types of wild card
+  zero_value = ['0']
 
   def __init__(self, suit, value):
     self.suit = suit
@@ -28,7 +31,7 @@ class Deck:
     # sets the deck to empty to start a round
 
   def reset_deck(self):
-    self.cards = ([Card(suit, value) for suit in Card.suits for value in Card.values ] * 2) + ([Card(suit, value) for suit in Card.wild_suit for value in Card.wild_value] * 4) 
+    self.cards = ([Card(suit, value) for suit in Card.suits for value in Card.values ] * 2) + ([Card(suit, value) for suit in Card.wild_suit for value in Card.wild_value] * 4 + [Card(suit, value) for suit in Card.suits for value in Card.zero_value]) 
     # Create a card for every possible suit and value combination
     
     self.shuffle()
@@ -49,9 +52,10 @@ class Deck:
 
 # drawing face up cards
 def draw_card(card, x, y, face_up = True):
-    card_width, card_height = 70, 110
+    card_width, card_height = 80, 120
     # sets the dimensions of the cards
-    font = pygame.font.Font(None, 36)
+    large_font = pygame.font.Font(None, 36)
+    small_font = pygame.font.Font(None, 31)
     # sets the font for the value and suit
     
     if face_up:
@@ -66,33 +70,37 @@ def draw_card(card, x, y, face_up = True):
       else:
         color = (0, 0, 0)
         
-      pygame.draw.rect(screen, color,
-      (x, y, card_width, card_height))
+      pygame.draw.rect(screen, color, (x, y, card_width, card_height))
       # draws the card face
-      pygame.draw.rect(screen, (0, 0, 0),
-      (x, y, card_width, card_height), 2)
+      pygame.draw.rect(screen, white, (x, y, card_width, card_height), 2)
       # draws the card border
         
       # sets the colour of the text based off the suit
-      value_text = font.render(card.value, True, (255, 255, 255))
-      suit_text = font.render(card.value, True, (255, 255, 255))
+      corner_text = small_font.render(card.value, True, white)
+      centre_text = large_font.render(card.value, True, white)
       # writes the suit and the value onto the card
 
-      value_x = x + 6
-      bottom_value_x = x + 48
+      value_x = x + (2 if card.value is '+2' or card.value is '+4' else 6)
+      bottom_value_x = x + (51 if card.value is '+2' or card.value is '+4' else 56)
       # shifts the position of the value on the 10 card since
       # it is a larger value than the others
 
-      screen.blit(value_text, (value_x, y + 8))
-      screen.blit(suit_text, (x + 24, y + 45))
-      screen.blit(value_text, (bottom_value_x, y + 85))
+      screen.blit(corner_text, (value_x, y + 8))
+      screen.blit(centre_text, (x + 27, y + 45))
+      screen.blit(corner_text, (bottom_value_x, y + 90))
       # writes the value in the top right and bottom left corners
       # and the suit in the centre of the card
+      
+      cross_pos = (value_x + 12, y + 12)
+      
+      if card.value is 'O':
+        pygame.draw.line(screen, white, cross_pos, (cross_pos[0] - 8, cross_pos[1] + 10), 3)
       
 
 
 
 hand = []
+white = (255, 255, 255)
 
 drawing_cards = Deck()
 for i in range(7):
@@ -104,13 +112,22 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 # sets the size of the display
 while True:
-  screen.fill((255, 255, 255))
-  for j in range(7):
-    draw_card(hand[j], 325 + j * 25, 450, face_up = True)
+  screen.fill((0, 0, 0))
+  for j in range(len(hand)):
+    draw_card(hand[j], (375 - (len(hand) * 13)) + j * 30, 450, face_up = True)
     # draws the user's two cards
     
   pygame.display.flip()
   # allows it to be displayed
+  
+  
+  for event in pygame.event.get():
+    if event.type == pygame.KEYDOWN:
+      if event.key == pygame.K_r:
+        hand = []
+        drawing_cards = Deck()
+        for i in range(7):
+          drawing_cards.draw()
 
 
 
